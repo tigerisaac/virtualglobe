@@ -1,6 +1,7 @@
 # .github/workflows/build-windows.yml
-name: Build Windows Executable 
+name: Build Windows Executable # Name of the workflow displayed on GitHub
 
+# Controls when the workflow will run
 on:
   push:
     branches: [ "main" ] # Run on pushes to the main branch
@@ -8,60 +9,68 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest 
+    runs-on: windows-latest # Use the latest Windows runner provided by GitHub
 
     steps:
-  
+    # 1. Check out your repository code
     - name: Check out repository
-      uses: actions/checkout@v4 
+      uses: actions/checkout@v4 # Use the standard checkout action
 
-   
+    # 2. Set up Python 3.11
     - name: Set up Python 3.11
       uses: actions/setup-python@v5
       with:
         python-version: '3.11'
-        cache: 'pip'
+        # Optional: Cache pip dependencies for faster subsequent builds
+        # cache: 'pip'
 
-
+    # 3. Install dependencies
     - name: Install Python dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
+      # Note: This assumes requirements.txt lists:
+      # Flask, waitress, opencv-python, numpy, mediapipe, Pillow, pyinstaller
 
-    
+    # 4. Build the executable with PyInstaller (Revised Path Finding)
     - name: Build executable with PyInstaller
       run: |
-        # Find the site-packages directory dynamically
-        $site_packages_path = python -c "import site; print(site.getsitepackages()[0])"
-        Write-Host "Found site-packages at: $site_packages_path"
+        # Find the directory containing the mediapipe package itself
+        $mediapipe_pkg_dir = python -c "import mediapipe, os; print(os.path.dirname(mediapipe.__file__))"
+        Write-Host "Found MediaPipe package directory at: $mediapipe_pkg_dir"
 
-        # Construct the path to mediapipe modules
-        $mediapipe_modules_path = Join-Path $site_packages_path "mediapipe\modules"
+        # Construct the path to the modules subdirectory
+        $mediapipe_modules_path = Join-Path $mediapipe_pkg_dir "modules" # Append 'modules'
         Write-Host "Using MediaPipe modules path: $mediapipe_modules_path"
 
-        # Check if the templates directory exists
+        # Check if the templates directory exists in the repository root
         if (-not (Test-Path -Path "templates" -PathType Container)) {
-          Write-Error "Error: 'templates' directory not found in repository root."
+          Write-Error "Error: 'templates' directory not found in repository root. Make sure it exists and was committed."
           exit 1
         }
-        # Check if the mediapipe modules path exists
+        # Check if the calculated mediapipe modules path exists after installation
          if (-not (Test-Path -Path $mediapipe_modules_path -PathType Container)) {
-           Write-Error "Error: MediaPipe modules directory not found at calculated path: $mediapipe_modules_path. Installation might have failed or path is wrong."
+           Write-Error "Error: MediaPipe modules directory not found at calculated path: $mediapipe_modules_path. Check mediapipe installation in the previous step and path calculation."
+           # Optional: List files in pkg dir for debugging
+           Write-Host "Listing contents of $mediapipe_pkg_dir (if it exists):"
+           if (Test-Path -Path $mediapipe_pkg_dir -PathType Container) { Get-ChildItem -Path $mediapipe_pkg_dir | Select-Object -ExpandProperty Name } else { Write-Host "$mediapipe_pkg_dir not found."}
            exit 1
          }
 
-        # Run PyInstaller command (using PowerShell syntax for variables)
-        # Using --onefile mode here. Remove if you want a folder output.
+        # Run PyInstaller command
+        Write-Host "Running PyInstaller..."
         pyinstaller --noconfirm --onefile --name HandEyeGlobeApp `
           --add-data "$($mediapipe_modules_path);mediapipe\modules" `
           --add-data "templates;templates" `
           main.py
-      shell: pwsh 
+      shell: pwsh # Use PowerShell for variable handling on Windows runners
 
-   
+    # 5. Upload the artifact (the built executable)
+    #    This makes the .exe downloadable from the workflow run page.
     - name: Upload Windows Executable Artifact
       uses: actions/upload-artifact@v4
       with:
         name: HandEyeGlobeApp-Windows # Name of the artifact zip file
         path: dist/HandEyeGlobeApp.exe # Path to the single executable created by --onefile
+        # If you didn't use --onefile, change path to: dist/HandEyeGlobeApp/
         if-no-files-found: error # Fail the workflow if the executable wasn't created
