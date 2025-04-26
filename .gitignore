@@ -6,3 +6,6 @@ build/
 *.spec
 *.log
 settings.json 
+templates/notworking.html
+templates/placeholder.txt
+templates/test.html

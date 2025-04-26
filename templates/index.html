@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hand & Eye Navigation Demo</title>
+    <title>Hand Eye Globe App Pro Plus Air Max Space Ultra</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cesium.com/downloads/cesiumjs/releases/1.128/Build/Cesium/Cesium.js"></script>
+    <link href="https://cesium.com/downloads/cesiumjs/releases/1.128/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
     <style>
         body { padding: 15px; background-color: var(--bs-dark-bg-subtle); }
         .card { margin-bottom: 1rem; }
@@ -33,36 +35,43 @@
 <body>
     <div class="container-fluid">
         <header class="mb-3 text-center">
-            <h1>Hand & Eye Navigation Demo</h1>
+            <h1>Hand Eye Globe App Pro Plus Air Max Space Ultra</h1>
             <p class="lead text-muted">Rotate: Closed Fist | Spin: Flick Open | Zoom: 2 Hands Out | Click: Pinch</p>
         </header>
 
         <div class="row g-3">
             <!-- Left Column: Camera & Controls -->
             <div class="col-lg-7 col-md-6 order-md-1">
-                 <div class="card h-100"> <div class="card-header d-flex justify-content-between align-items-center py-2"> <h5 class="mb-0">Camera Feed</h5> <span id="tracking-status" class="badge bg-secondary">Tracking Off</span> </div> <div class="card-body d-flex flex-column p-2"> <div class="webcam-container flex-grow-1 mb-2"> <span id="calibration-status" class="badge bg-warning status-badge">Not Calibrated</span> <video id="webcam" autoplay playsinline></video> <canvas id="webcam-canvas"></canvas> <div id="eye-cursor" class="cursor-overlay d-none"></div> </div> <div class="d-flex justify-content-center mt-auto"> <button id="start-btn" class="btn btn-primary btn-sm me-2">Start Tracking</button> <button id="calibrate-btn" class="btn btn-info btn-sm me-2" disabled>Calibrate Eyes</button> <button id="stop-btn" class="btn btn-secondary btn-sm" disabled>Stop</button> </div> </div> </div>
+                 <div class="card h-100"> <div class="card-header d-flex justify-content-between align-items-center py-2"> <h5 class="mb-0">Camera Feed</h5> <span id="tracking-status" class="badge bg-secondary">Tracking Off</span> </div> <div class="card-body d-flex flex-column p-2" style="flex-grow: 1; height: 100%;">    <div class="webcam-container flex-grow-1 mb-2"> <span id="calibration-status" class="badge bg-warning status-badge">Not Calibrated</span> <video id="webcam" autoplay playsinline></video> <canvas id="webcam-canvas"></canvas> <div id="eye-cursor" class="cursor-overlay d-none"></div> </div> <div class="d-flex justify-content-center mt-auto"> <button id="start-btn" class="btn btn-primary btn-sm me-2">Start Tracking</button> <button id="calibrate-btn" class="btn btn-info btn-sm me-2" disabled>Calibrate Eyes</button> <button id="stop-btn" class="btn btn-secondary btn-sm" disabled>Stop</button> </div> </div> </div>
             </div>
 
-            <!-- Right Column: Gestures & Globe -->
-            <div class="col-lg-5 col-md-6 order-md-2">
-                 <div class="card mb-3"> <div class="card-header d-flex justify-content-between align-items-center py-2"> <h5 class="mb-0">3D Globe Control</h5> <button id="reset-globe-btn" class="btn btn-outline-light btn-sm">Reset View</button> </div> <div class="card-body p-0" style="height: 300px; position: relative;"> <div id="globe-container"></div> <div id="globe-loading" class="text-center text-muted position-absolute top-50 start-50 translate-middle">Loading Globe...</div> </div> </div>
-                <div class="card">
-                    <div class="card-header py-2"><h5 class="mb-0">Gesture Status</h5></div>
-                    <div class="card-body p-2">
-                        <div id="gesture-display" class="mb-2"> <p class="text-center text-muted small mb-0">No active gestures</p> </div>
-                        <table class="table table-sm small mb-0">
-                            <tbody>
-                                <!-- Reflect ALL gestures backend sends -->
-                                <tr> <td><span class="gesture-indicator inactive" data-gesture="click"></span> <b>Click</b></td> <td>Thumb+Index Pinch</td> </tr>
-                                <tr> <td><span class="gesture-indicator inactive" data-gesture="rotate"></span> <b>Rotate</b></td> <td>Closed Fist</td> </tr>
-                                <tr> <td><span class="gesture-indicator inactive" data-gesture="zoom_in"></span> <b>Zoom In</b></td> <td>2 Splayed Hands Out</td> </tr>
-                                <tr> <td><span class="gesture-indicator" style="background-color: magenta; border: 1px solid magenta; opacity: 0.5;"></span> <b>Spin</b></td> <td>Flick (Open Fist)</td> </tr>
-                            </tbody>
-                        </table>
+            <div class="col-lg-5 col-md-6 order-md-2 d-flex flex-column">
+                <div class="card flex-grow-1 fill-height-card">
+                    <div class="card-header d-flex justify-content-between align-items-center py-2">
+                        <h5 class="mb-0">3D Globe Control</h5>
+                        <button id="reset-globe-btn" class="btn btn-outline-light btn-sm">Reset View</button>
+                    </div>
+                    <div class="card-body p-0 flex-grow-1" style="position: relative;">
+                        <div id="cesiumContainer" style="width: 100%; height: 100%; position: absolute; top: 0; left: 0;"></div>
+
                     </div>
                 </div>
-            </div>
-        </div>
+                <div class="card flex-shrink-0 mt-3">
+                   <div class="card-header py-2"><h5 class="mb-0">Gesture Status</h5></div>
+                   <div class="card-body p-2">
+                       <div id="gesture-display" class="mb-2"> <p class="text-center text-muted small mb-0">No active gestures</p> </div>
+                       <table class="table table-sm small mb-0">
+                            <tbody>
+                                <tr> <td><span class="gesture-indicator inactive" data-gesture="click"></span> <b>Click</b></td> <td>Thumb+Index Pinch</td> </tr>
+                                <tr> <td><span class="gesture-indicator inactive" data-gesture="rotate"></span> <b>Rotate</b></td> <td>Closed Fist / Pinch</td> </tr>
+                                <tr> <td><span class="gesture-indicator inactive" data-gesture="zoom_in"></span> <b>Zoom In</b></td> <td>2 Splayed Hands Out</td> </tr>
+                                <tr> <td><span class="gesture-indicator" style="background-color: magenta; border: 1px solid magenta; opacity: 0.5;"></span> <b>Spin</b></td> <td>Flick (Release Rotate)</td> </tr>
+                            </tbody>
+                        </table>
+                   </div>
+               </div>
+           </div>
+       </div>
 
         <!-- Optional Demo Area -->
         <div class="row mt-3"> <div class="col-12"> <div class="card"> <div class="card-header py-2"><h5 class="mb-0">Interaction Demo Area (Eye Cursor)</h5></div> <div class="card-body"> <div class="display-area" id="demo-area"> <div class="text-center"> <p class="small">Eye cursor test area.</p> <div class="btn-group"> <button class="btn btn-sm btn-outline-primary demo-btn">Btn 1</button> <button class="btn btn-sm btn-outline-secondary demo-btn">Btn 2</button> <button class="btn btn-sm btn-outline-success demo-btn">Btn 3</button> </div> </div> <div id="demo-cursor" class="cursor-overlay d-none"></div> </div> </div> </div> </div> </div>
@@ -74,58 +83,71 @@
 
     <!-- JS Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
     <!-- Your Main Application Script -->
     <script defer>
-        if (typeof THREE === 'undefined') { alert("Error: Three.js failed to load."); }
-        else {
+        Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIyYzY3NTUzMi0wZTI4LTRlYTktYmVlNS0zYzZhYTgxODRkOTciLCJpZCI6Mjk3MDIyLCJpYXQiOjE3NDU1Mjc5NzJ9.VtQJi-MNieaMa7c_UOnrR51nBJOA1k8EZJr0EEol8qA';
+
+// Initialize the Cesium Viewer in the HTML element with the `cesiumContainer` ID.
+cesiumViewer = new Cesium.Viewer('cesiumContainer', {
+    
+                    animation: false, baseLayerPicker: false, fullscreenButton: false, vrButton: false,
+                    geocoder: true, homeButton: false, infoBox: false, sceneModePicker: false,
+                    selectionIndicator: false, timeline: false, navigationHelpButton: false,
+                    navigationInstructionsInitiallyVisible: false, scene3DOnly: true
+                });
+
+                
+
+
+
+
+
             document.addEventListener('DOMContentLoaded', function() {
                 // --- DOM Elements ---
-                const video = document.getElementById('webcam'); const canvas = document.getElementById('webcam-canvas'); const startBtn = document.getElementById('start-btn'); const stopBtn = document.getElementById('stop-btn'); const calibrateBtn = document.getElementById('calibrate-btn'); const eyeCursor = document.getElementById('eye-cursor'); const demoCursor = document.getElementById('demo-cursor'); const trackingStatus = document.getElementById('tracking-status'); const calibrationStatus = document.getElementById('calibration-status'); const gestureDisplay = document.getElementById('gesture-display'); const calibrationModalElement = document.getElementById('calibration-modal'); const calibrationModal = calibrationModalElement ? new bootstrap.Modal(calibrationModalElement) : null; const calibrationContainer = document.getElementById('calibration-container'); const calibrationInstructions = document.getElementById('calibration-instructions'); const calibrationProgressBar = document.querySelector('#calibration-progress .progress-bar'); const gestureIndicators = document.querySelectorAll('.gesture-indicator'); const globeContainer = document.getElementById('globe-container'); const globeLoadingText = document.getElementById('globe-loading'); const resetGlobeBtn = document.getElementById('reset-globe-btn');
+                const video = document.getElementById('webcam'); const canvas = document.getElementById('webcam-canvas'); const startBtn = document.getElementById('start-btn'); const stopBtn = document.getElementById('stop-btn'); const calibrateBtn = document.getElementById('calibrate-btn'); const eyeCursor = document.getElementById('eye-cursor'); const demoCursor = document.getElementById('demo-cursor'); const trackingStatus = document.getElementById('tracking-status'); const calibrationStatus = document.getElementById('calibration-status'); const gestureDisplay = document.getElementById('gesture-display'); const calibrationModalElement = document.getElementById('calibration-modal'); const calibrationModal = calibrationModalElement ? new bootstrap.Modal(calibrationModalElement) : null; const calibrationContainer = document.getElementById('calibration-container'); const calibrationInstructions = document.getElementById('calibration-instructions'); const calibrationProgressBar = document.querySelector('#calibration-progress .progress-bar'); const gestureIndicators = document.querySelectorAll('.gesture-indicator');
+            const cesiumContainer = document.getElementById('cesiumContainer');
+            const resetGlobeBtn = document.getElementById('reset-globe-btn');
 
-                // --- State Variables ---
-                let stream = null, isTracking = false, isCalibrated = false, processingInterval = null; let lastEyePosition = { x: 0.5, y: 0.5 }; let videoElementForDimensions = document.createElement('video'); let ctx = null;
+            // --- State Variables ---
+            let stream = null, isTracking = false, isCalibrated = false, processingInterval = null; let lastEyePosition = { x: 0.5, y: 0.5 }; let videoElementForDimensions = document.createElement('video'); let ctx = null;
 
-                // --- Globe & Hand State ---
-                let scene, camera, renderer, globe, ambientLight, directionalLight; let isActivelyRotating = false; let previousRotatePos = null;
-                let globeSpinVelocity = { x: 0, y: 0 }; const rotationSensitivity = 3.5; const initialCameraZ = 3.0; const flickSensitivity = 18.0; const spinDamping = 0.965;
-                const zoomSpeed = 0.05; const minZoomZ = 1.5; const maxZoomZ = 10.0;
+            // --- CesiumJS & Hand State ---
+            let isActivelyRotating = false; let previousRotatePos = null;
+            let globeSpinVelocity = { x: 0, y: 0 }; const rotationSensitivity = 3; const flickSensitivity = 18.0; const spinDamping = 0.965;
+            const zoomSpeed = 0.15; const minCameraHeight = 150.0; const maxCameraHeight = 30000000.0;
 
-                // --- Initialization ---
-                if (!video || !canvas || !startBtn || !stopBtn || !trackingStatus || !gestureDisplay || !resetGlobeBtn) { console.error("CRITICAL: Essential UI elements missing!"); alert("UI Error."); return; }
-                try { ctx = canvas.getContext('2d'); if (!ctx) throw new Error("Canvas context fail."); } catch (error) { console.error("CRITICAL: Canvas context fail:", error); alert("Error: Cannot init drawing context."); canvas.style.display='none'; video.style.display='block'; }
-                if (globeContainer) initializeGlobe(); else console.warn("Globe container not found.");
-                setupInitialUIState(); addEventListeners();
+            if (!video || !canvas || !startBtn || !stopBtn || !trackingStatus || !gestureDisplay || !resetGlobeBtn || !cesiumContainer) { console.error("CRITICAL: Essential UI elements missing!"); alert("UI Error."); /* Maybe return or stop? */ }
+            // Try getting canvas context
+            try { ctx = canvas.getContext('2d'); if (!ctx) throw new Error("Canvas context fail."); } catch (error) { console.error("CRITICAL: Canvas context fail:", error); alert("Error: Cannot init drawing context."); canvas.style.display='none'; video.style.display='block'; }
 
                 // --- Functions ---
                 function setupInitialUIState() { stopBtn.disabled = true; if (calibrateBtn) calibrateBtn.disabled = true; updateCalibrationStatusUI(); canvas.style.display = 'none'; video.style.display = 'block'; }
-                function addEventListeners() { startBtn.addEventListener('click', startTracking); stopBtn.addEventListener('click', stopTracking); if (calibrateBtn) calibrateBtn.addEventListener('click', performCalibration); if (resetGlobeBtn) resetGlobeBtn.addEventListener('click', resetGlobeView); window.addEventListener('resize', onWindowResize, false); document.querySelectorAll('.demo-btn').forEach(btn => { btn.addEventListener('click', () => btn.classList.toggle('active')); }); }
+                function addEventListeners() { startBtn.addEventListener('click', startTracking); stopBtn.addEventListener('click', stopTracking);  if (resetGlobeBtn) resetGlobeBtn.addEventListener('click', resetGlobeView);  document.querySelectorAll('.demo-btn').forEach(btn => { btn.addEventListener('click', () => btn.classList.toggle('active')); }); }
                 async function startWebcam() { /* ... Full implementation ... */ if(stream)return true;try{stream=await navigator.mediaDevices.getUserMedia({video:{width:{ideal:640},height:{ideal:480}},audio:false});videoElementForDimensions.srcObject=stream;video.srcObject=stream;return new Promise((resolve)=>{videoElementForDimensions.onloadedmetadata=()=>{video.play().catch(e=>console.warn("Vis vid play warn:",e));videoElementForDimensions.play().then(()=>{console.log(`Webcam started: ${videoElementForDimensions.videoWidth}x${videoElementForDimensions.videoHeight}`);resolve(true);}).catch(e=>{console.error("Hid vid play fail:",e);resolve(false);});};videoElementForDimensions.onerror=(e)=>{console.error("Vid stream err:",e);resolve(false);}});}catch(error){console.error('Webcam access err:',error);alert('Could not access webcam.');stopWebcam();return false;}}
                 function stopWebcam() { /* ... Full implementation ... */ if(processingInterval){clearInterval(processingInterval);processingInterval=null;}if(stream){stream.getTracks().forEach(track=>track.stop());}video.srcObject=null;videoElementForDimensions.srcObject=null;stream=null;if(ctx){canvas.style.display='none';video.style.display='block';ctx.clearRect(0,0,canvas.width||640,canvas.height||480);}else{video.style.display='block';}}
                 function setupDisplayCanvas() { /* ... Full implementation ... */ if(!ctx)return;const dW=videoElementForDimensions.videoWidth||640;const dH=videoElementForDimensions.videoHeight||480;if(canvas.width!==dW||canvas.height!==dH){canvas.width=dW;canvas.height=dH;}if(isTracking){canvas.style.display='block';video.style.display='none';}}
 
                 async function processFrame() {
-                    if (!isTracking || !stream || videoElementForDimensions.paused || videoElementForDimensions.ended || videoElementForDimensions.videoWidth === 0) return;
-                    const tempCanvas=document.createElement('canvas'); const tempCtx=tempCanvas.getContext('2d'); if(!tempCtx) return;
-                    tempCanvas.width=videoElementForDimensions.videoWidth; tempCanvas.height=videoElementForDimensions.videoHeight;
-                    tempCtx.drawImage(videoElementForDimensions, 0, 0, tempCanvas.width, tempCanvas.height);
-                    const dataURL = tempCanvas.toDataURL('image/jpeg', 0.7);
-                    try {
-                        const response = await fetch('/process_frame', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ image: dataURL }) });
-                        if (!response.ok) { console.error(`Server error: ${response.status}`); return; }
-                        const data = await response.json();
+                if (!isTracking || !stream || videoElementForDimensions.paused || videoElementForDimensions.ended || videoElementForDimensions.videoWidth === 0) return;
+                const tempCanvas=document.createElement('canvas'); const tempCtx=tempCanvas.getContext('2d'); if(!tempCtx) return;
+                tempCanvas.width=videoElementForDimensions.videoWidth; tempCanvas.height=videoElementForDimensions.videoHeight;
+                tempCtx.drawImage(videoElementForDimensions, 0, 0, tempCanvas.width, tempCanvas.height);
+                const dataURL = tempCanvas.toDataURL('image/jpeg', 0.7);
+                try {
+                    const response = await fetch('/process_frame', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ image: dataURL }) });
+                    if (!response.ok) { console.error(`Server error: ${response.status}`); return; }
+                    const data = await response.json();
 
-                        if (ctx && data.processed_image) { const img = new Image(); img.onload = () => { setupDisplayCanvas(); ctx.drawImage(img, 0, 0, canvas.width, canvas.height); }; img.onerror = () => console.error("Err loading processed img"); img.src = data.processed_image; }
-                        if (data.cursor_pos) { lastEyePosition = { x: data.cursor_pos.x / 100.0, y: data.cursor_pos.y / 100.0 }; updateEyeCursorDisplay(data.cursor_pos); } else { updateEyeCursorDisplay(null); }
-                        updateGestureIndicators(data.gestures || {});
-                        // *** Pass ALL relevant data to interaction handler ***
-                        handleGlobeInteraction(data.gestures, data.rotating_hand_position, data.flick_detected, data.flick_velocity);
-                        if (typeof data.is_calibrated === 'boolean') { isCalibrated = data.is_calibrated; updateCalibrationStatusUI(); }
-                        if (data.gestures?.click) { console.log("CLICK detected!"); }
+                    if (ctx && data.processed_image) { const img = new Image(); img.onload = () => { setupDisplayCanvas(); ctx.drawImage(img, 0, 0, canvas.width, canvas.height); }; img.onerror = () => console.error("Err loading processed img"); img.src = data.processed_image; }
+                    if (data.cursor_pos) { lastEyePosition = { x: data.cursor_pos.x / 100.0, y: data.cursor_pos.y / 100.0 }; updateEyeCursorDisplay(data.cursor_pos); } else { updateEyeCursorDisplay(null); }
+                    updateGestureIndicators(data.gestures || {});
+                    handleCesiumInteraction(data.gestures, data.rotating_hand_position, data.flick_detected, data.flick_velocity);
+                    if (typeof data.is_calibrated === 'boolean') { isCalibrated = data.is_calibrated; updateCalibrationStatusUI(); }
+                    if (data.gestures?.click) { console.log("CLICK detected!"); }
 
-                    } catch (error) { console.error('Err processing frame:', error); }
-                }
+                } catch (error) { console.error('Err processing frame:', error); }
+            }
 
                 function updateEyeCursorDisplay(pos) { /* ... Full implementation ... */ if(!eyeCursor||!demoCursor)return;if(pos){const x=`${pos.x}%`,y=`${pos.y}%`;eyeCursor.classList.remove('d-none');eyeCursor.style.left=x;eyeCursor.style.top=y;demoCursor.classList.remove('d-none');demoCursor.style.left=x;demoCursor.style.top=y;}else{eyeCursor.classList.add('d-none');demoCursor.classList.add('d-none');}}
                 function updateGestureIndicators(gestures) { /* ... Full implementation ... */ if(!gestureDisplay||!gestureIndicators)return;gestureIndicators.forEach(indicator=>{const name=indicator.getAttribute('data-gesture');if(name&&gestures.hasOwnProperty(name)){if(gestures[name]){indicator.classList.remove('inactive');indicator.classList.add('active');}else{indicator.classList.remove('active');indicator.classList.add('inactive');}}else if(name){indicator.classList.remove('active');indicator.classList.add('inactive');}});const activeNames=Object.entries(gestures).filter(([_,v])=>v).map(([k,_])=>k.replace(/_/g,' '));if(activeNames.length>0)gestureDisplay.innerHTML=`<div class="alert alert-success py-1 px-2 small mb-0 text-capitalize">Active: ${activeNames.join(', ')}</div>`;else gestureDisplay.innerHTML=`<p class="text-center text-muted small mb-0">No active gestures</p>`;}
@@ -133,12 +155,127 @@
                 async function startTracking() { /* ... Full implementation ... */ if(isTracking)return;const ok=await startWebcam();if(!ok){alert("Webcam failed.");return;}isTracking=true;trackingStatus.textContent='Tracking On';trackingStatus.className='badge bg-success';startBtn.disabled=true;stopBtn.disabled=false;if(calibrateBtn)calibrateBtn.disabled=false;video.style.display='none';if(ctx)canvas.style.display='block';else video.style.display='block';if(processingInterval)clearInterval(processingInterval);processingInterval=setInterval(processFrame,70);}
                 function stopTracking() { /* ... Full implementation ... */ if(!isTracking)return;isTracking=false;trackingStatus.textContent='Tracking Off';trackingStatus.className='badge bg-secondary';startBtn.disabled=false;stopBtn.disabled=true;if(calibrateBtn)calibrateBtn.disabled=true;stopWebcam();updateEyeCursorDisplay(null);updateGestureIndicators({});gestureDisplay.innerHTML=`<p class="text-center text-muted small mb-0">No active gestures</p>`;isActivelyRotating=false;previousRotatePos=null;globeSpinVelocity={x:0,y:0};}
 
-                // --- Calibration Logic (Keep Full implementation) ---
-                let calibrationPoints = []; let currentCalibrationPointIndex = 0; let calibrationPointElement = null; let isCalibrating = false;
-                async function performCalibration() { /* ... */ } function displayNextCalibrationPoint() { /* ... */ } async function captureEyePositionForPoint(screenPointCoords) { /* ... */ } async function finishCalibration() { /* ... */ } function handleCalibrationError(message) { /* ... */ } function setCalibrationInstructions(htmlContent) { /* ... */ } function updateCalibrationProgress(fraction) { /* ... */ } function animateCalibrationPoint(element) { /* ... */ }
-                 // (Paste full calibration functions here)
+                initializeCesiumGlobe(); // Call the init function
+                setupInitialUIState();
+                addEventListeners();
+
+                function setupInitialUIState() { stopBtn.disabled = true; if (calibrateBtn) calibrateBtn.disabled = true; updateCalibrationStatusUI(); canvas.style.display = 'none'; video.style.display = 'block'; }
+            function addEventListeners() { startBtn.addEventListener('click', startTracking); stopBtn.addEventListener('click', stopTracking);  if (resetGlobeBtn) resetGlobeBtn.addEventListener('click', resetGlobeView); document.querySelectorAll('.demo-btn').forEach(btn => { btn.addEventListener('click', () => btn.classList.toggle('active')); }); }
+            async function startWebcam() { if (stream) return true; try { stream = await navigator.mediaDevices.getUserMedia({ video: { width: { ideal: 640 }, height: { ideal: 480 } }, audio: false }); videoElementForDimensions.srcObject = stream; video.srcObject = stream; return new Promise((resolve) => { videoElementForDimensions.onloadedmetadata = () => { video.play().catch(e => console.warn("Vis vid play warn:", e)); videoElementForDimensions.play().then(() => { console.log(`Webcam started: ${videoElementForDimensions.videoWidth}x${videoElementForDimensions.videoHeight}`); resolve(true); }).catch(e => { console.error("Hid vid play fail:", e); resolve(false); }); }; videoElementForDimensions.onerror = (e) => { console.error("Vid stream err:", e); resolve(false); } }); } catch (error) { console.error('Webcam access err:', error); alert('Could not access webcam.'); stopWebcam(); return false; } }
+            function stopWebcam() { if (processingInterval) { clearInterval(processingInterval); processingInterval = null; } if (stream) { stream.getTracks().forEach(track => track.stop()); } video.srcObject = null; videoElementForDimensions.srcObject = null; stream = null; if (ctx) { canvas.style.display = 'none'; video.style.display = 'block'; ctx.clearRect(0, 0, canvas.width || 640, canvas.height || 480); } else { video.style.display = 'block'; } }
+            function setupDisplayCanvas() { if (!ctx) return; const dW = videoElementForDimensions.videoWidth || 640; const dH = videoElementForDimensions.videoHeight || 480; if (canvas.width !== dW || canvas.height !== dH) { canvas.width = dW; canvas.height = dH; } if (isTracking) { canvas.style.display = 'block'; video.style.display = 'none'; } }
+            // --- CesiumJS Globe Functions ---
+            function initializeCesiumGlobe() {
+                console.log("Attempting Cesium Viewer initialization...");
+                Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI4ZjZhZGZjYi1lOWRkLTRkNzUtODFjYi0xZGFjYjIzMjljOTgiLCJpZCI6Mjk3MDIyLCJpYXQiOjE3NDU1Mjk0MzN9.GiKSb2jaxdZ_7ixQSCDbWJXbjw7wncq-e99ClFMm2IM'; // Your token
+                
+                if (!cesiumContainer) { console.error("Cesium container missing"); return; }
+                    if (cesiumViewer.scene) {
+                        cesiumViewer.scene.globe.enableLighting = true;
+                        cesiumViewer.scene.postProcessStages.fxaa.enabled = true;
+                        cesiumViewer.screenSpaceEventHandler.removeInputAction(Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
+                        // Set initial camera slightly more zoomed out than default home
+                        cesiumViewer.camera.flyHome(0); // Go home instantly first
+                        // Then zoom out slightly more if needed (adjust factor)
+                        //cesiumViewer.camera.zoomOut(200000000.0); // Example: Zoom out 2000km more
+
+                        // Start disabled, enable only when hand is NOT interacting
+                         cesiumViewer.scene.screenSpaceCameraController.enableInputs = true; // Start enabled, disable during hand interaction
+                    }
+                    console.log("CesiumJS Viewer initialized successfully.");
+                    startCesiumRenderLoop();
+                
+            }   
+
+            // --- Cesium Interaction & Animation ---
+            function handleCesiumInteraction(gestures, rotatingHandPos, flickDetected, flickVelocity) {
+                if (!cesiumViewer || !cesiumViewer.scene || !cesiumViewer.camera) return;
+                const rotateActive = gestures?.rotate === true && rotatingHandPos;
+                const zoomActive = gestures?.zoom_in === true;
+                const scene = cesiumViewer.scene;
+                const camera = cesiumViewer.camera;
+
+                // Disable default controls ONLY when interacting with hands
+                const isHandInteracting = rotateActive || zoomActive;
+                scene.screenSpaceCameraController.enableInputs = !isHandInteracting;
+
+                // 1. Handle Rotation (Fist or Pinch)
+                if (rotateActive) {
+                    if (!isActivelyRotating) {
+                        isActivelyRotating = true;
+                        previousRotatePos = rotatingHandPos;
+                        globeSpinVelocity = { x: 0, y: 0 }; // Stop any residual spin
+                    } else if (previousRotatePos) {
+                        const rotatescale = camera.positionCartographic.height / 10000000;
+                        const deltaX = rotatingHandPos.x - previousRotatePos.x;
+                        const deltaY = rotatingHandPos.y - previousRotatePos.y;
+                        camera.rotateRight(deltaX * rotatescale * -1);
+                        camera.rotateUp(deltaY * rotatescale * -1);
+                        previousRotatePos = rotatingHandPos;
+                    }
+                } else { // Rotation gesture NOT active
+                    if (isActivelyRotating) { // Just ended direct rotation
+                        isActivelyRotating = false;
+                        previousRotatePos = null;
+                    }
+                    // 2. Handle Flick
+                    if (flickDetected && flickVelocity) {
+                        const flickScale = camera.positionCartographic.height / 10000000 * 6;
+                        globeSpinVelocity.y = flickVelocity.x * flickScale;
+                        globeSpinVelocity.x = -flickVelocity.y * flickScale;
+                    }
+                }
+
+                // 3. Handle Zoom In
+                if (zoomActive) {
+                    const currentHeight = camera.positionCartographic.height;
+                    if (currentHeight > minCameraHeight) {
+                        const moveAmount = currentHeight * zoomSpeed;
+                        camera.moveForward(Math.min(moveAmount, currentHeight - minCameraHeight)); // Prevent zooming below min height
+                    }
+                }
+            } // End handleCesiumInteraction
+
+            // --- Cesium Render Loop Integration ---
+            function startCesiumRenderLoop() {
+                if (!cesiumViewer || !cesiumViewer.clock) {
+                    console.error("Cannot start Cesium render loop - viewer or clock not ready.");
+                    return;
+                }
+                cesiumViewer.clock.onTick.addEventListener(applySpinAndDamping);
+                console.log("CesiumJS render loop integrated.");
+             }
+
+            function applySpinAndDamping() {
+                if (!cesiumViewer || !cesiumViewer.camera) return;
+                const camera = cesiumViewer.camera;
+                // Apply spin ONLY if not actively rotating and velocity exists
+                if (!isActivelyRotating && (Math.abs(globeSpinVelocity.x) > 1e-4 || Math.abs(globeSpinVelocity.y) > 1e-4)) {
+                     camera.rotateRight(globeSpinVelocity.y * 0.016 * -1); // Apply Y vel to Right rot
+                     camera.rotateUp(globeSpinVelocity.x * 0.016 * -1); // Apply X vel to Up rot
+
+                     // Apply damping
+                     globeSpinVelocity.x *= spinDamping;
+                     globeSpinVelocity.y *= spinDamping;
+
+                     // Stop if velocity is negligible
+                     if (Math.abs(globeSpinVelocity.x) < 1e-4) globeSpinVelocity.x = 0;
+                     if (Math.abs(globeSpinVelocity.y) < 1e-4) globeSpinVelocity.y = 0;
+                 }
+             }
+
+            // --- Reset Globe View ---
+            function resetGlobeView() {
+                if(cesiumViewer&&cesiumViewer.camera){
+                    cesiumViewer.camera.flyHome(1.0); // Fly home smoothly
+                    isActivelyRotating=false; previousRotatePos=null; globeSpinVelocity={x:0, y:0}; // Reset state
+                    if(cesiumViewer.scene){ cesiumViewer.scene.screenSpaceCameraController.enableInputs=true; } // Re-enable mouse/touch
+                }
+            }
 
 
+
+            /*
                 // --- Globe Interaction Logic (Combined Rotate, Flick, Zoom) ---
                 function handleGlobeInteraction(gestures, rotatingHandPos, flickDetected, flickVelocity) {
                     if (!globe || !camera) return;
@@ -210,10 +347,11 @@
                 }
 
                 function onWindowResize() { if (!camera || !renderer || !globeContainer) return; const w = globeContainer.clientWidth; const h = globeContainer.clientHeight; if (w > 0 && h > 0) { camera.aspect = w / h; camera.updateProjectionMatrix(); renderer.setSize(w, h); } }
-
+*/
             });// End DOMContentLoaded
-        } // End THREE check
     </script>
 
 </body>
 </html>
+
+

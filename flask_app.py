@@ -308,8 +308,8 @@ def calibrate_endpoint():
         logger.error(f"Invalid action '{action}' received in /calibrate")
         return jsonify({'status': 'error', 'message': 'Invalid action specified'}), 400
 
-# if __name__ == '__main__':
-#     print("Starting Flask development server...")
-#     app.run(host='0.0.0.0', port=5000, debug=True)
-# else:
-#      pass
+if __name__ == '__main__':
+    print("Starting Flask development server...")
+    app.run(host='0.0.0.0', port=5000, debug=True)
+else:
+  pass
